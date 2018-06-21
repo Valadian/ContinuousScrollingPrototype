@@ -10,18 +10,23 @@ public class TileManager : MonoBehaviour {
     public int WIDTH = 30;
     public int HEIGHT = 10;
     public int PAGE_WIDTH = 12;
+    public Camera main;
+    public Camera left;
+    public Camera right;
 
     // Use this for initialization
 	void Start () {
+        left.transform.localPosition = -transform.right * Tile.X_SIZE * WIDTH;
+        right.transform.localPosition = transform.right * Tile.X_SIZE * WIDTH;
         tiles = Enumerable.Range(0, WIDTH).Select(x => Enumerable.Range(0, HEIGHT).Select(y => {
             Tile tile = Instantiate(tilePrefab);
             tile.Initialize(x, y);
-            if(x<= PAGE_WIDTH) {
-                tile.Illusion(WIDTH, 1);
-            }
-            if (x >= WIDTH - PAGE_WIDTH) {
-                tile.Illusion(WIDTH, -1);
-            }
+            //if(x<= PAGE_WIDTH) {
+            //    tile.Illusion(WIDTH, 1);
+            //}
+            //if (x >= WIDTH - PAGE_WIDTH) {
+            //    tile.Illusion(WIDTH, -1);
+            //}
             return tile;
         }).ToArray()).ToArray();
 	}
@@ -31,7 +36,10 @@ public class TileManager : MonoBehaviour {
 	void Update () {
         var d = 1-Input.GetAxis("Mouse ScrollWheel");
         if (d != 1) {
-            Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize * d, 0.25f, 3.2f);
+            var orthographicSize = Mathf.Clamp(main.orthographicSize * d, 0.25f, 3.2f);
+            main.orthographicSize = orthographicSize;
+            left.orthographicSize = orthographicSize;
+            right.orthographicSize = orthographicSize;
         }
         HandleMouseDrag();
     }
@@ -41,22 +49,22 @@ public class TileManager : MonoBehaviour {
     void HandleMouseDrag() {
         if (Input.GetMouseButtonDown(0)) {
             dragOrigin = Input.mousePosition;
-            start = Camera.main.transform.position;
+            start = main.transform.position;
             return;
         }
         if (!Input.GetMouseButton(0)) return;
 
-        Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
+        Vector3 pos = main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
         Vector3 move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed);
 
-        Camera.main.transform.position = start-move*Camera.main.orthographicSize;
+        main.transform.position = start-move* main.orthographicSize;
 
-        var new_pos = Camera.main.transform.position;
+        var new_pos = main.transform.position;
         var new_x = new_pos.x % (WIDTH * Tile.X_SIZE);
         if (new_x < 0) {
             new_x += (WIDTH * Tile.X_SIZE);
         }
-        Camera.main.transform.position = new Vector3(new_x, Mathf.Clamp(new_pos.y,0,HEIGHT*Tile.Y_SIZE),-10);
+        main.transform.position = new Vector3(new_x, Mathf.Clamp(new_pos.y,0,HEIGHT*Tile.Y_SIZE),-10);
 
 
     }
