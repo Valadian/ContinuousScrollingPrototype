@@ -11,6 +11,7 @@ public class TileManager : MonoBehaviour {
     public int HEIGHT = 10;
     public int PAGE_WIDTH = 12;
     public Camera main;
+    public Camera foreground;
     public Camera left;
     public Camera right;
 
@@ -38,6 +39,7 @@ public class TileManager : MonoBehaviour {
         if (d != 1) {
             var orthographicSize = Mathf.Clamp(main.orthographicSize * d, 0.25f, 3.2f);
             main.orthographicSize = orthographicSize;
+            foreground.orthographicSize = orthographicSize;
             left.orthographicSize = orthographicSize;
             right.orthographicSize = orthographicSize;
         }
